@@ -11,8 +11,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
         <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/classes/:classId" element={<ClassPage />} />
           <Route path="/students" element={<StudentDirectoryPage />} />
