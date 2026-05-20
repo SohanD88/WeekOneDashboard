@@ -19,14 +19,13 @@ function normalizeContact(id: string, data: Record<string, unknown>): Contact {
   return {
     ...data,
     id,
-    role: String(data.role ?? '').toLowerCase() as Contact['role'],
+    role: String(data.role ?? '').toLowerCase(),
   } as Contact
 }
 
 export async function getContacts(): Promise<Contact[]> {
-  const nameQuery = query(col, orderBy('name'))
-  const snap = await getDocs(nameQuery)
-  return snap.docs.map((document) => normalizeContact(document.id, document.data()))
+  const snap = await getDocs(query(col, orderBy('name')))
+  return snap.docs.map((docSnapshot) => normalizeContact(docSnapshot.id, docSnapshot.data()))
 }
 
 export async function getContact(id: string): Promise<Contact | null> {

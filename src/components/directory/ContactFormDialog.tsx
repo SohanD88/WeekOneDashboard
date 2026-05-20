@@ -71,7 +71,7 @@ export default function ContactFormDialog({
             <Text size="2" weight="medium">Name</Text>
             <TextField.Root
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              onChange={(event) => setForm({ ...form, name: event.target.value })}
               placeholder="Full name"
             />
           </Flex>
@@ -81,7 +81,7 @@ export default function ContactFormDialog({
             <TextField.Root
               type="email"
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onChange={(event) => setForm({ ...form, email: event.target.value })}
               placeholder="email@example.com"
             />
           </Flex>
@@ -91,7 +91,7 @@ export default function ContactFormDialog({
             <TextField.Root
               type="tel"
               value={form.phoneNumber}
-              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+              onChange={(event) => setForm({ ...form, phoneNumber: event.target.value })}
               placeholder="(555) 000-0000"
             />
           </Flex>
@@ -100,14 +100,14 @@ export default function ContactFormDialog({
             <Text size="2" weight="medium">Address</Text>
             <TextField.Root
               value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              onChange={(event) => setForm({ ...form, address: event.target.value })}
               placeholder="123 Main St"
             />
           </Flex>
 
           <Flex direction="column" gap="1">
             <Text size="2" weight="medium">Role</Text>
-            <Select.Root value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
+            <Select.Root value={form.role} onValueChange={(selectedRole) => setForm({ ...form, role: selectedRole })}>
               <Select.Trigger variant="surface" />
               <Select.Content>
                 <Select.Item value="student">Student</Select.Item>
@@ -121,7 +121,7 @@ export default function ContactFormDialog({
             <TextField.Root
               type="number"
               value={String(form.classNumber)}
-              onChange={(e) => setForm({ ...form, classNumber: Number(e.target.value) })}
+              onChange={(event) => setForm({ ...form, classNumber: Number(event.target.value) })}
               placeholder="1"
             />
           </Flex>

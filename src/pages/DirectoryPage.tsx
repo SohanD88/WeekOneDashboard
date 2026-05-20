@@ -44,7 +44,7 @@ export default function DirectoryPage() {
 
   useEffect(() => {
     getContacts()
-      .then((all) => setContacts(all.filter((c) => c.role === 'student' || c.role === 'teacher')))
+      .then((allContacts) => setContacts(allContacts.filter((contact) => contact.role === 'student' || contact.role === 'teacher')))
       .catch(() => setError('Failed to load contacts. Please try again.'))
       .finally(() => setLoading(false))
   }, [])
@@ -82,8 +82,8 @@ export default function DirectoryPage() {
     if (!editingContact) return
     await updateContact(editingContact.id, data)
     setContacts((prev) =>
-      prev.map((c) =>
-        c.id === editingContact.id ? { ...editingContact, ...data, updatedAt: new Date() } : c,
+      prev.map((contact) =>
+        contact.id === editingContact.id ? { ...editingContact, ...data, updatedAt: new Date() } : contact,
       ),
     )
     setEditingContact(null)
