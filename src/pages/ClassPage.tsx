@@ -16,7 +16,18 @@ import {
 import { getClass, updateClass } from '@/api/classes'
 import { getStudents, updateStudent } from '@/api/students'
 import { getTeachers, updateTeacher } from '@/api/teachers'
-import { createGrade } from '@/api/grades'
+import { createGrade, deleteGrade, getGradesByClass, updateGrade } from '@/api/grades'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 import { calculateWeightedAverage, classAverageFrom, letterGradeFor } from '@/lib/grades'
 import {
   CATEGORY_WEIGHTS,
@@ -28,6 +39,23 @@ import {
 } from '@/types'
 
 const CATEGORIES = Object.keys(CATEGORY_WEIGHTS) as GradeCategory[]
+
+/*
+Current Classes:
+ID	Name
+2q9rJTPoiqc4w6qjgCU5	Intermediate Math (Math, 1st)
+KnttGOBIALBcx4T3IGEB	Advanced Math (Math, 2nd)
+MpKVfexIb0u784TlFDzk	Beginning Reading (English, 3rd)
+UOrCPWR2dRUIwmO1emho	Reading & Writing (English, 2nd)
+UWMl1IbQB5iEKqwF3WRC	Science Explorers (Science, 3rd)
+eFMw4xLcXNd8tg2gF72Z	Art Studio (Art, 5th)
+eTmc8i4uEV1ixd9BVwZM	Math Fundamentals (Math, 1st)
+gOPw0f0terEshpFYgYe2	Physical Education (PE, 6th)
+iU8QIIXJosGgO1AMKTGW	Intro to Science (Science, 2nd)
+q91c6dsy2TBA6m4HSlNH	Music Makers (Music, 5th)
+rQLkG4fuKMNmAsZjJFrp	Creative Writing (English, 4th)
+wKSfafxTPe1bNWeXebeD	Our Community (Social Studies, 4th)
+*/
 
 function Placeholder({ label, minHeight = 120 }: { label: string; minHeight?: number }) {
   return (
@@ -45,11 +73,6 @@ function Placeholder({ label, minHeight = 120 }: { label: string; minHeight?: nu
       <Text size="2" color="gray">{label}</Text>
     </Flex>
   )
-}
-
-// TODO: replace with teammate's getGradesForClass(classId) when available
-async function getGradesForClass(_classId: string): Promise<Grade[]> {
-  return []
 }
 
 export default function ClassPage() {
@@ -75,7 +98,7 @@ export default function ClassPage() {
       getClass(classId),
       getStudents(),
       getTeachers(),
-      getGradesForClass(classId),
+      getGradesByClass(classId),
     ])
     setSchoolClass(c)
     setAllStudents(students)
@@ -122,6 +145,48 @@ export default function ClassPage() {
   )
 
   const selectedAverage = selectedStudentId ? studentAverages.get(selectedStudentId) ?? null : null
+
+  // Pie chart: distribution of letter grades across enrolled students.
+  const LETTER_COLORS: Record<string, string> = {
+    A: 'var(--green-9)',
+    B: 'var(--blue-9)',
+    C: 'var(--yellow-9)',
+    D: 'var(--orange-9)',
+    F: 'var(--red-9)',
+  }
+  const gradeDistribution = useMemo(() => {
+    const buckets: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 }
+    for (const avg of studentAverages.values()) {
+      const letter = letterGradeFor(avg)
+      if (letter) buckets[letter] += 1
+    }
+    return Object.entries(buckets)
+      .filter(([, count]) => count > 0)
+      .map(([letter, count]) => ({ name: letter, value: count }))
+  }, [studentAverages])
+
+  // Bar chart: selected student's average score per category.
+  const studentGrades = useMemo(
+    () => (selectedStudentId ? grades.filter((g) => g.studentId === selectedStudentId) : []),
+    [grades, selectedStudentId],
+  )
+  const categoryBreakdown = useMemo(() => {
+    return CATEGORIES.map((c) => {
+      const inCat = studentGrades.filter((g) => g.category === c)
+      const avg = inCat.length === 0 ? 0 : inCat.reduce((s, g) => s + g.score, 0) / inCat.length
+      return { category: c, average: Number(avg.toFixed(1)) }
+    })
+  }, [studentGrades])
+
+  async function changeGradeScore(gradeId: string, newScore: number) {
+    if (Number.isNaN(newScore)) return
+    await updateGrade(gradeId, { score: newScore })
+    reload()
+  }
+  async function removeGrade(gradeId: string) {
+    await deleteGrade(gradeId)
+    reload()
+  }
 
   async function enrollStudent() {
     if (!schoolClass || !enrollPick) return
@@ -205,7 +270,7 @@ export default function ClassPage() {
   }
 
   return (
-    <Flex direction="column" gap="4" style={{ flex: 1, minHeight: 0 }}>
+    <Flex direction="column" gap="4" style={{ height: 'calc(100vh - 110px)' }}>
       <Flex align="center" gap="3">
         <Button asChild variant="soft" size="2">
           <Link to="/dashboard">← Back to directory</Link>
@@ -256,7 +321,7 @@ export default function ClassPage() {
             </Flex>
           </Card>
 
-          <Card style={{ display: 'flex', flexDirection: 'column', maxHeight: 520 }}>
+          <Card style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <Heading size="3" mb="3">Students</Heading>
             <Flex direction="column" gap="2" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
               {enrolledStudents.length === 0 && (
@@ -313,7 +378,7 @@ export default function ClassPage() {
 
         {/* MIDDLE: Class average + Selected student grade */}
         <Flex direction="column" gap="4" style={{ minHeight: 0 }}>
-          <Card>
+          <Card style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <Flex justify="between" align="center" mb="2">
               <Heading size="3">Class Average</Heading>
               <Text size="6" weight="bold">
@@ -323,9 +388,53 @@ export default function ClassPage() {
                 )}
               </Text>
             </Flex>
-            <Placeholder label="Pie chart (grade distribution)" />
+            {gradeDistribution.length === 0 ? (
+              <Placeholder label="No grades yet" />
+            ) : (
+              <Flex style={{ flex: 1, minHeight: 0 }} align="center" gap="2">
+                <Flex direction="column" gap="1">
+                  {[
+                    { letter: 'A', range: '90–100' },
+                    { letter: 'B', range: '80–89' },
+                    { letter: 'C', range: '70–79' },
+                    { letter: 'D', range: '60–69' },
+                    { letter: 'F', range: '0–59' },
+                  ].map(({ letter, range }) => (
+                    <Flex key={letter} align="center" gap="2">
+                      <Box
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 2,
+                          background: LETTER_COLORS[letter],
+                        }}
+                      />
+                      <Text size="1" weight="bold">{letter}</Text>
+                      <Text size="1" color="gray">{range}</Text>
+                    </Flex>
+                  ))}
+                </Flex>
+                <Box style={{ flex: 1, minHeight: 0, height: '100%' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={gradeDistribution}
+                        dataKey="value"
+                        nameKey="name"
+                        label={(d) => `${d.name}: ${d.value}`}
+                      >
+                        {gradeDistribution.map((d) => (
+                          <Cell key={d.name} fill={LETTER_COLORS[d.name]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Box>
+              </Flex>
+            )}
           </Card>
-          <Card>
+          <Card style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <Flex justify="between" align="center" mb="2">
               <Heading size="3">
                 {selectedStudentId
@@ -336,7 +445,20 @@ export default function ClassPage() {
                 {selectedAverage !== null ? `${selectedAverage.toFixed(1)}%` : '--'}
               </Text>
             </Flex>
-            <Placeholder label="Bar chart (by category)" />
+            {!selectedStudentId ? (
+              <Placeholder label="Select a student to see their breakdown" />
+            ) : (
+              <Box style={{ flex: 1, minHeight: 0 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={categoryBreakdown}>
+                    <XAxis dataKey="category" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Bar dataKey="average" fill="var(--indigo-9)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+            )}
           </Card>
         </Flex>
 
@@ -381,9 +503,66 @@ export default function ClassPage() {
               </Button>
             </Flex>
           </Card>
-          <Card>
-            <Heading size="3" mb="2">Growth</Heading>
-            <Placeholder label="Line chart (student progress)" minHeight={140} />
+          <Card style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            <Heading size="3" mb="2">
+              {selectedStudentId
+                ? `${enrolledStudents.find((s) => s.id === selectedStudentId)?.firstName}'s Assignments`
+                : 'Assignments'}
+            </Heading>
+            {!selectedStudentId ? (
+              <Text size="2" color="gray">Select a student to see their assignments.</Text>
+            ) : studentGrades.length === 0 ? (
+              <Text size="2" color="gray">No assignments yet.</Text>
+            ) : (
+              <Flex direction="column" gap="3" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                {CATEGORIES.map((cat) => {
+                  const inCat = studentGrades.filter((g) => g.category === cat)
+                  if (inCat.length === 0) return null
+                  return (
+                    <Box key={cat}>
+                      <Text size="1" weight="bold" color="gray" style={{ textTransform: 'uppercase' }}>
+                        {cat}
+                      </Text>
+                      <Flex direction="column" gap="1" mt="1">
+                        {inCat.map((g) => (
+                          <Flex
+                            key={g.id}
+                            justify="between"
+                            align="center"
+                            gap="2"
+                            p="2"
+                            style={{ borderRadius: 'var(--radius-2)', background: 'var(--gray-a2)' }}
+                          >
+                            <Text size="2" style={{ flex: 1 }}>{g.assignmentName}</Text>
+                            <TextField.Root
+                              size="1"
+                              type="number"
+                              defaultValue={g.score}
+                              style={{ width: 70 }}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value)
+                                if (v !== g.score) changeGradeScore(g.id, v)
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
+                              }}
+                            />
+                            <IconButton
+                              size="1"
+                              variant="soft"
+                              color="red"
+                              onClick={() => removeGrade(g.id)}
+                            >
+                              ×
+                            </IconButton>
+                          </Flex>
+                        ))}
+                      </Flex>
+                    </Box>
+                  )
+                })}
+              </Flex>
+            )}
           </Card>
         </Flex>
       </Grid>
