@@ -8,6 +8,8 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  query,
+  where,
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
@@ -34,6 +36,18 @@ export async function createGrade(
     updatedAt: serverTimestamp(),
   })
   return ref.id
+}
+
+export async function getGradesByClass(classId: string): Promise<Grade[]> {
+  const q = query(col, where('classId', '==', classId))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Grade)
+}
+
+export async function getGradesByStudent(studentId: string): Promise<Grade[]> {
+  const q = query(col, where('studentId', '==', studentId))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Grade)
 }
 
 export async function updateGrade(
