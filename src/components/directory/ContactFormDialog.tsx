@@ -61,36 +61,49 @@ export default function ContactFormDialog({
     }
   }
 
-  function field(
-    label: string,
-    value: string,
-    onChange: (v: string) => void,
-    placeholder?: string,
-    type = 'text',
-  ) {
-    return (
-      <Flex direction="column" gap="1">
-        <Text size="2" weight="medium">{label}</Text>
-        <TextField.Root
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      </Flex>
-    )
-  }
-
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Content maxWidth="480px">
         <Dialog.Title>{contact ? 'Edit Contact' : 'Add Contact'}</Dialog.Title>
 
         <Flex direction="column" gap="3" mt="4">
-          {field('Name', form.name, (v) => setForm({ ...form, name: v }), 'Full name')}
-          {field('Email', form.email, (v) => setForm({ ...form, email: v }), 'email@example.com', 'email')}
-          {field('Phone Number', form.phoneNumber, (v) => setForm({ ...form, phoneNumber: v }), '(555) 000-0000', 'tel')}
-          {field('Address', form.address, (v) => setForm({ ...form, address: v }), '123 Main St')}
+          <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">Name</Text>
+            <TextField.Root
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Full name"
+            />
+          </Flex>
+
+          <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">Email</Text>
+            <TextField.Root
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="email@example.com"
+            />
+          </Flex>
+
+          <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">Phone Number</Text>
+            <TextField.Root
+              type="tel"
+              value={form.phoneNumber}
+              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+              placeholder="(555) 000-0000"
+            />
+          </Flex>
+
+          <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">Address</Text>
+            <TextField.Root
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              placeholder="123 Main St"
+            />
+          </Flex>
 
           <Flex direction="column" gap="1">
             <Text size="2" weight="medium">Role</Text>
@@ -103,13 +116,15 @@ export default function ContactFormDialog({
             </Select.Root>
           </Flex>
 
-          {field(
-            'Class Number',
-            String(form.classNumber),
-            (v) => setForm({ ...form, classNumber: Number(v) }),
-            '1',
-            'number',
-          )}
+          <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">Class Number</Text>
+            <TextField.Root
+              type="number"
+              value={String(form.classNumber)}
+              onChange={(e) => setForm({ ...form, classNumber: Number(e.target.value) })}
+              placeholder="1"
+            />
+          </Flex>
         </Flex>
 
         <Flex gap="3" mt="5" justify="end">

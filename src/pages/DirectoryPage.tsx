@@ -1,30 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Box, Callout, Flex, Grid, IconButton, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
+import { Box, Callout, Flex, IconButton, Spinner, Text, TextField } from '@radix-ui/themes'
 import { ExclamationTriangleIcon, MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
 import ContactCard from '@/components/directory/ContactCard'
 import ContactFormDialog from '@/components/directory/ContactFormDialog'
+import ContactListHeader from '@/components/directory/ContactListHeader'
 import DirectoryFilter from '@/components/directory/DirectoryFilter'
 import { createContact, deleteContact, getContacts, updateContact } from '@/api/contacts'
 import type { Contact } from '@/types'
-
-function ContactListHeader() {
-  return (
-    <>
-      <Flex align="center" gap="4" px="4">
-        <Grid columns="1.5fr 2fr 1fr 2.5fr 1fr 0.5fr" gap="6" flexGrow="1">
-          <Text size="1" weight="bold" color="gray">Name</Text>
-          <Text size="1" weight="bold" color="gray">Email</Text>
-          <Text size="1" weight="bold" color="gray">Phone Number</Text>
-          <Text size="1" weight="bold" color="gray">Address</Text>
-          <Text size="1" weight="bold" color="gray">Role</Text>
-          <Text size="1" weight="bold" color="gray">Class</Text>
-        </Grid>
-        <Box width="20px" />
-      </Flex>
-      <Separator size="4" />
-    </>
-  )
-}
 
 function ContactList({
   contacts,
@@ -109,7 +91,7 @@ export default function DirectoryPage() {
 
   async function handleDelete(id: string) {
     await deleteContact(id)
-    setContacts((prev) => prev.filter((c) => c.id !== id))
+    setContacts((prev) => prev.filter((contact) => contact.id !== id))
   }
 
   return (
