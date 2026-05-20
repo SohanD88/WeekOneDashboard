@@ -86,7 +86,7 @@ export default function HomePage() {
               </Heading>
 
               <Text as="p" color="gray" mb="4">
-                A modern dashboard for managing students,
+                Dashboard for managing students,
                 teachers, classes, grades, and school events.
               </Text>
 
@@ -98,11 +98,10 @@ export default function HomePage() {
             </Card>
 
             <Text as="p" mt="4" color="gray">
-              Thomas Jefferson Elementary is moving from paper
-              records to a digital dashboard. This application
-              helps school administrators manage enrollment,
-              classroom rosters, teacher assignments, grades,
-              and important school events in one organized place.
+              Thomas Jefferson Elementary is moving from paper records to a digital
+              dashboard. This application helps administrators and teachers manage
+              enrollment, classrooms, grades, and school events, while giving students
+              and parents easier access to important information and updates.
             </Text>
           </div>
         </Flex>
