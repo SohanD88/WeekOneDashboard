@@ -12,3 +12,12 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.contact-student,
+.contact-teacher {
+  border-radius: var(--radius-3);
+  border: 1px solid var(--gray-a4);
+}
+
+.contact-student { background-color: var(--blue-3); }
+.contact-teacher { background-color: var(--indigo-3); }

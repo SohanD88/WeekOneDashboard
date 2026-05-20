@@ -1,5 +1,3 @@
-// CRUD operations for the `contacts` Firestore collection
-
 import {
   collection,
   doc,
@@ -9,21 +7,31 @@ import {
   updateDoc,
   deleteDoc,
   serverTimestamp,
+  query,
+  orderBy,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { Contact } from '@/types'
 
 const col = collection(db, 'contacts')
 
+function normalizeContact(id: string, data: Record<string, unknown>): Contact {
+  return {
+    ...data,
+    id,
+    role: String(data.role ?? '').toLowerCase(),
+  } as Contact
+}
+
 export async function getContacts(): Promise<Contact[]> {
-  const snap = await getDocs(col)
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Contact)
+  const snap = await getDocs(query(col, orderBy('name')))
+  return snap.docs.map((docSnapshot) => normalizeContact(docSnapshot.id, docSnapshot.data()))
 }
 
 export async function getContact(id: string): Promise<Contact | null> {
   const snap = await getDoc(doc(db, 'contacts', id))
   if (!snap.exists()) return null
-  return { id: snap.id, ...snap.data() } as Contact
+  return normalizeContact(snap.id, snap.data())
 }
 
 export async function createContact(
