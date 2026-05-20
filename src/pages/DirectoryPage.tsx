@@ -1,33 +1,49 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Box, Callout, Flex, Grid, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
-import { ExclamationTriangleIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
+import { Box, Callout, Flex, Grid, IconButton, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
+import { ExclamationTriangleIcon, MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
 import ContactCard from '@/components/directory/ContactCard'
+import ContactFormDialog from '@/components/directory/ContactFormDialog'
 import DirectoryFilter from '@/components/directory/DirectoryFilter'
-import { getContacts } from '@/api/contacts'
+import { createContact, deleteContact, getContacts, updateContact } from '@/api/contacts'
 import type { Contact } from '@/types'
 
 function ContactListHeader() {
   return (
     <>
-      <Grid columns="1.5fr 2fr 1fr 2.5fr 1fr 0.5fr" gap="6" px="4">
-        <Text size="1" weight="bold" color="gray">Name</Text>
-        <Text size="1" weight="bold" color="gray">Email</Text>
-        <Text size="1" weight="bold" color="gray">Phone Number</Text>
-        <Text size="1" weight="bold" color="gray">Address</Text>
-        <Text size="1" weight="bold" color="gray">Role</Text>
-        <Text size="1" weight="bold" color="gray">Class</Text>
-      </Grid>
+      <Flex align="center" gap="4" px="4">
+        <Grid columns="1.5fr 2fr 1fr 2.5fr 1fr 0.5fr" gap="6" flexGrow="1">
+          <Text size="1" weight="bold" color="gray">Name</Text>
+          <Text size="1" weight="bold" color="gray">Email</Text>
+          <Text size="1" weight="bold" color="gray">Phone Number</Text>
+          <Text size="1" weight="bold" color="gray">Address</Text>
+          <Text size="1" weight="bold" color="gray">Role</Text>
+          <Text size="1" weight="bold" color="gray">Class</Text>
+        </Grid>
+        <Box width="20px" />
+      </Flex>
       <Separator size="4" />
     </>
   )
 }
 
-function ContactList({ contacts }: { contacts: Contact[] }) {
+function ContactList({
+  contacts,
+  onEdit,
+  onDelete,
+}: {
+  contacts: Contact[]
+  onEdit: (contact: Contact) => void
+  onDelete: (id: string) => void
+}) {
   return (
     <>
       {contacts.map((contact) => (
         <Box key={contact.id}>
-          <ContactCard contact={contact} />
+          <ContactCard
+            contact={contact}
+            onEdit={() => onEdit(contact)}
+            onDelete={() => onDelete(contact.id)}
+          />
         </Box>
       ))}
     </>
@@ -41,6 +57,8 @@ export default function DirectoryPage() {
   const [search, setSearch] = useState('')
   const [roleFilters, setRoleFilters] = useState<string[]>([])
   const [classFilter, setClassFilter] = useState<number | null>(null)
+  const [addOpen, setAddOpen] = useState(false)
+  const [editingContact, setEditingContact] = useState<Contact | null>(null)
 
   useEffect(() => {
     getContacts()
@@ -57,14 +75,42 @@ export default function DirectoryPage() {
   const filteredContacts = useMemo(() => {
     const searchQuery = search.toLowerCase()
     return contacts
-      .filter((contact) =>
-        searchQuery === '' ||
-        contact.name.toLowerCase().includes(searchQuery) ||
-        contact.email.toLowerCase().includes(searchQuery),
+      .filter(
+        (contact) =>
+          searchQuery === '' ||
+          contact.name.toLowerCase().includes(searchQuery) ||
+          contact.email.toLowerCase().includes(searchQuery),
       )
       .filter((contact) => roleFilters.length === 0 || roleFilters.includes(contact.role))
       .filter((contact) => classFilter === null || contact.classNumber === classFilter)
   }, [contacts, search, roleFilters, classFilter])
+
+  async function handleAdd(data: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) {
+    const id = await createContact(data)
+    const newContact: Contact = {
+      ...data,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    setContacts((prev) => [...prev, newContact].sort((a, b) => a.name.localeCompare(b.name)))
+  }
+
+  async function handleEdit(data: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) {
+    if (!editingContact) return
+    await updateContact(editingContact.id, data)
+    setContacts((prev) =>
+      prev.map((c) =>
+        c.id === editingContact.id ? { ...editingContact, ...data, updatedAt: new Date() } : c,
+      ),
+    )
+    setEditingContact(null)
+  }
+
+  async function handleDelete(id: string) {
+    await deleteContact(id)
+    setContacts((prev) => prev.filter((c) => c.id !== id))
+  }
 
   return (
     <Box p="6" width="100%">
@@ -90,6 +136,11 @@ export default function DirectoryPage() {
             onClassChange={setClassFilter}
             availableClasses={availableClasses}
           />
+          <Box ml="auto">
+            <IconButton variant="outline" onClick={() => setAddOpen(true)}>
+              <PlusIcon />
+            </IconButton>
+          </Box>
         </Flex>
 
         <ContactListHeader />
@@ -111,8 +162,27 @@ export default function DirectoryPage() {
           <Text color="gray" align="center" mt="8">No contacts found.</Text>
         )}
 
-        {!loading && <ContactList contacts={filteredContacts} />}
+        {!loading && (
+          <ContactList
+            contacts={filteredContacts}
+            onEdit={setEditingContact}
+            onDelete={handleDelete}
+          />
+        )}
       </Flex>
+
+      <ContactFormDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onSubmit={handleAdd}
+      />
+
+      <ContactFormDialog
+        open={editingContact !== null}
+        onOpenChange={(open) => { if (!open) setEditingContact(null) }}
+        contact={editingContact ?? undefined}
+        onSubmit={handleEdit}
+      />
     </Box>
   )
 }
