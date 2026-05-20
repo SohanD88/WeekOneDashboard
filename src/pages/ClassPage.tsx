@@ -39,6 +39,7 @@ import {
 } from '@/types'
 
 const CATEGORIES = Object.keys(CATEGORY_WEIGHTS) as GradeCategory[]
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 /*
 Current Classes:
@@ -174,7 +175,7 @@ export default function ClassPage() {
     return CATEGORIES.map((c) => {
       const inCat = studentGrades.filter((g) => g.category === c)
       const avg = inCat.length === 0 ? 0 : inCat.reduce((s, g) => s + g.score, 0) / inCat.length
-      return { category: c, average: Number(avg.toFixed(1)) }
+      return { category: capitalize(c), average: Number(avg.toFixed(1)) }
     })
   }, [studentGrades])
 
@@ -482,7 +483,7 @@ export default function ClassPage() {
                 <Select.Content>
                   {CATEGORIES.map((c) => (
                     <Select.Item key={c} value={c}>
-                      {c} ({Math.round(CATEGORY_WEIGHTS[c] * 100)}%)
+                      {capitalize(c)} ({Math.round(CATEGORY_WEIGHTS[c] * 100)}%)
                     </Select.Item>
                   ))}
                 </Select.Content>
@@ -521,7 +522,7 @@ export default function ClassPage() {
                   return (
                     <Box key={cat}>
                       <Text size="1" weight="bold" color="gray" style={{ textTransform: 'uppercase' }}>
-                        {cat}
+                        {capitalize(cat)}
                       </Text>
                       <Flex direction="column" gap="1" mt="1">
                         {inCat.map((g) => (
