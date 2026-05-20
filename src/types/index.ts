@@ -28,16 +28,40 @@ export interface SchoolClass {
   studentIds: string[]
   period: string
   schoolYear: string
+  averageGrade: number | null
+  averageLetterGrade: string | null
   createdAt: Date
   updatedAt: Date
+}
+
+export type GradeCategory = 'quizzes' | 'tests' | 'participation' | 'projects'
+
+export const CATEGORY_WEIGHTS: Record<GradeCategory, number> = {
+  quizzes: 0.20,
+  tests: 0.30,
+  participation: 0.25,
+  projects: 0.25,
 }
 
 export interface Grade {
   id: string
   studentId: string
   classId: string
-  score: number       // 0–100
-  letterGrade: string // A, B, C, D, F
+  assignmentName: string
+  category: GradeCategory
+  score: number // 0–100
+  updatedAt: Date
+}
+
+export interface Contact {
+  id: string
+  name: string
+  email: string
+  phoneNumber: string
+  address: string
+  role: string
+  classNumber: number
+  createdAt: Date
   updatedAt: Date
 }
 
