@@ -1,10 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Box, Callout, Flex, Spinner, Text, TextField } from '@radix-ui/themes'
+import { Box, Callout, Flex, Grid, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
 import { ExclamationTriangleIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import ContactCard from '@/components/directory/ContactCard'
 import DirectoryFilter from '@/components/directory/DirectoryFilter'
 import { getContacts } from '@/api/contacts'
 import type { Contact } from '@/types'
+
+function ContactListHeader() {
+  return (
+    <>
+      <Grid columns="1.5fr 2fr 1fr 2.5fr 1fr 0.5fr" gap="6" px="4">
+        <Text size="1" weight="bold" color="gray">Name</Text>
+        <Text size="1" weight="bold" color="gray">Email</Text>
+        <Text size="1" weight="bold" color="gray">Phone Number</Text>
+        <Text size="1" weight="bold" color="gray">Address</Text>
+        <Text size="1" weight="bold" color="gray">Role</Text>
+        <Text size="1" weight="bold" color="gray">Class</Text>
+      </Grid>
+      <Separator size="4" />
+    </>
+  )
+}
 
 function ContactList({ contacts }: { contacts: Contact[] }) {
   return (
@@ -75,6 +91,8 @@ export default function DirectoryPage() {
             availableClasses={availableClasses}
           />
         </Flex>
+
+        <ContactListHeader />
 
         {error && (
           <Callout.Root color="red">
