@@ -3,7 +3,7 @@ import Layout from './components/layout/Layout'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
 import ClassPage from './pages/ClassPage'
-import StudentDirectoryPage from './pages/StudentDirectoryPage'
+import StudentDirectoryPage from './pages/DirectoryPage'
 import TeacherDirectoryPage from './pages/TeacherDirectoryPage'
 import CalendarPage from './pages/CalendarPage'
 

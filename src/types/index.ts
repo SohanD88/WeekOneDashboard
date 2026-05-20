@@ -51,3 +51,15 @@ export interface SchoolEvent {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface Contact {
+  id: string
+  name: string
+  email: string
+  phoneNumber: string
+  address: string
+  role: 'student' | 'teacher'
+  classNumber: number
+  createdAt: Date
+  updatedAt: Date
+}
