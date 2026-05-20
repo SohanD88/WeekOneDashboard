@@ -67,7 +67,7 @@ export default function HomePage() {
             </Card>
 
             <img
-              src="/thomas-jefferson-school.jpe"
+              src="/thomas-jefferson-school.jpeg"
               alt="Thomas Jefferson Elementary"
               style={{
                 width: '100%',
