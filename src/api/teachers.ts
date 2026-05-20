@@ -10,8 +10,8 @@ import {
   deleteDoc,
   serverTimestamp,
 } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-import type { Teacher } from '@/types'
+import { db } from '../lib/firebase'
+import type { Teacher } from '../types'
 
 const col = collection(db, 'teachers')
 
