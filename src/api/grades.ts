@@ -12,8 +12,8 @@ import {
   where,
   serverTimestamp,
 } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-import type { Grade } from '@/types'
+import { db } from '../lib/firebase'
+import type { Grade } from '../types'
 
 const col = collection(db, 'grades')
 
