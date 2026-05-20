@@ -15,16 +15,24 @@ import type { Contact } from '@/types'
 
 const col = collection(db, 'contacts')
 
+function normalizeContact(id: string, data: Record<string, unknown>): Contact {
+  return {
+    ...data,
+    id,
+    role: String(data.role ?? '').toLowerCase() as Contact['role'],
+  } as Contact
+}
+
 export async function getContacts(): Promise<Contact[]> {
   const nameQuery = query(col, orderBy('name'))
   const snap = await getDocs(nameQuery)
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Contact)
+  return snap.docs.map((document) => normalizeContact(document.id, document.data()))
 }
 
 export async function getContact(id: string): Promise<Contact | null> {
   const snap = await getDoc(doc(db, 'contacts', id))
   if (!snap.exists()) return null
-  return { id: snap.id, ...snap.data() } as Contact
+  return normalizeContact(snap.id, snap.data())
 }
 
 export async function createContact(

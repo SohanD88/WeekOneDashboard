@@ -58,7 +58,7 @@ export interface Contact {
   email: string
   phoneNumber: string
   address: string
-  role: 'student' | 'teacher'
+  role: string
   classNumber: number
   createdAt: Date
   updatedAt: Date
