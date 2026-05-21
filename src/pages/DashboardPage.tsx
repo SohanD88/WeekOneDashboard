@@ -1,9 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import {
-  Button,
   Card,
   Flex,
-  Heading,
   Text,
 } from '@radix-ui/themes'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
@@ -84,29 +83,36 @@ export default function DashboardPage() {
 
       <Card>
         {filteredClasses.map((classItem) => (
-          <Card>
-            <Flex
-              key={classItem.id}
-              align="center"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr repeat(3, minmax(160px, 1fr))',
-                gap: '1rem',
-              }}
+          <Card
+            key={classItem.id}
+            style={{ cursor: 'pointer', overflow: 'hidden' }}
+          >
+            <Link
+              to={`/classes/${classItem.id}`}
+              style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}
             >
-              <Text size="5" weight="bold">
-                {classItem.name}
-              </Text>
-              <Text size="2">
-                Teacher: {teacherMap[classItem.teacherId] || classItem.teacherId}
-              </Text>
-              <Text size="2">
-                Roster Size: {classItem.studentIds.length}
-              </Text>
-              <Text size="2">
-                Avg Grade: {classItem.averageLetterGrade}
-              </Text>
-            </Flex>
+              <Flex
+                align="center"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr repeat(3, minmax(160px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
+                <Text size="5" weight="bold">
+                  {classItem.name}
+                </Text>
+                <Text size="2">
+                  Teacher: {teacherMap[classItem.teacherId] || classItem.teacherId}
+                </Text>
+                <Text size="2">
+                  Roster Size: {classItem.studentIds.length}
+                </Text>
+                <Text size="2">
+                  Avg Grade: {classItem.averageLetterGrade}
+                </Text>
+              </Flex>
+            </Link>
           </Card>
 
         ))}
