@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const filteredClasses = useMemo(
     () =>
       classes.filter((item) =>
-        [item.name, item.id, item.teacherId, teacherMap[item.teacherId]]
+        [item.name, item.id, teacherMap[item.teacherId]]
           .join(' ')
           .toLowerCase()
           .includes(search.toLowerCase()),
