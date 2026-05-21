@@ -53,6 +53,17 @@ export interface Grade {
   updatedAt: Date
 }
 
+export interface SchoolEvent {
+  id: string
+  title: string
+  description: string
+  startDate: Date
+  endDate: Date
+  eventType: 'holiday' | 'exam' | 'activity' | 'meeting' | 'other'
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Contact {
   id: string
   name: string
@@ -61,17 +72,6 @@ export interface Contact {
   address: string
   role: string
   classNumber: number
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface SchoolEvent {
-  id: string
-  title: string
-  description: string
-  startDate: Date
-  endDate: Date
-  eventType: 'holiday' | 'exam' | 'activity' | 'meeting' | 'other'
   createdAt: Date
   updatedAt: Date
 }
