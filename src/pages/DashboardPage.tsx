@@ -68,7 +68,7 @@ export default function DashboardPage() {
       </Text>
       <Flex align="center" justify="center" gap="4">
 
-        <Card style={{ width: '80%' }}>
+        <Card style={{ width: '80%', margin: '1rem 0', display: 'flex', alignItems: 'center', padding: '0.5rem 1rem'  }}>
           <MagnifyingGlassIcon/>
           <input
             type="search"
